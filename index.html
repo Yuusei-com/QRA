@@ -4,23 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QRコードリーダー</title>
+  <!-- QRコードスキャンライブラリの読み込み -->
   <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
   <h1>QRコードを読み取る</h1>
-  <div id="reader" style="width: 300px;"></div>
+  <!-- カメラ映像を表示する要素 -->
+  <div id="reader" style="width: 300px; margin-bottom: 20px;"></div>
+  <!-- QRコードの内容を表示する要素 -->
   <div id="result">QRコードの内容がここに表示されます。</div>
 
   <script>
-    // QRコード読み取りの開始
+    // QRコードの読み取り成功時の処理
     function onScanSuccess(decodedText, decodedResult) {
       document.getElementById("result").innerText = `読み取ったQRコードの内容: ${decodedText}`;
       html5QrcodeScanner.clear(); // 読み取り終了
     }
 
+    // QRコードの読み取り失敗時の処理
+    function onScanFailure(error) {
+      console.warn(`QRコードの読み取りに失敗しました: ${error}`);
+    }
+
+    // QRコードリーダーの初期化
     let html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader", { fps: 10, qrbox: 250 });
-    html5QrcodeScanner.render(onScanSuccess);
+      "reader",                    // 映像を表示する要素のID
+      { fps: 10, qrbox: 250 },     // フレーム毎秒（fps）とQRコード検出範囲の設定
+      /* verbose= */ false          // 詳細ログの出力オプション
+    );
+
+    // QRコードのスキャンを開始
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
   </script>
 </body>
 </html>
