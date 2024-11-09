@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRコードリーダー</title>
+  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+</head>
+<body>
+  <h1>QRコードを読み取る</h1>
+  <div id="reader" style="width: 300px;"></div>
+  <div id="result">QRコードの内容がここに表示されます。</div>
+
+  <script>
+    // QRコード読み取りの開始
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("result").innerText = `読み取ったQRコードの内容: ${decodedText}`;
+      html5QrcodeScanner.clear(); // 読み取り終了
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+  </script>
+</body>
+</html>
