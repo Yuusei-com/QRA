@@ -52,6 +52,13 @@
       font-size: 1em;
       color: #007bff;
     }
+
+    /* エラーメッセージのスタイル */
+    #error-message {
+      color: red;
+      font-size: 1em;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -61,6 +68,8 @@
     <div id="reader">カメラの許可が必要です</div>
     <!-- QRコード読み取り結果表示 -->
     <div id="result">QRコードの内容がここに表示されます。</div>
+    <!-- エラーメッセージ表示 -->
+    <div id="error-message"></div>
   </div>
 
   <script>
@@ -77,15 +86,53 @@
       document.getElementById("result").style.color = "#555"; // グレー色に設定
     }
 
-    // QRコードリーダーの初期化
-    let html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader",
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      /* verbose= */ false
-    );
+    // カメラアクセスの確認
+    function checkCameraPermissions() {
+      navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+          const cameraDevices = devices.filter(device => device.kind === "videoinput");
+          if (cameraDevices.length === 0) {
+            // カメラが接続されていない場合
+            document.getElementById("error-message").innerText = "カメラが見つかりませんでした。";
+          } else {
+            // カメラが接続されている場合、カメラの権限を要求
+            requestCameraPermission();
+          }
+        })
+        .catch(error => {
+          console.error("カメラの確認中にエラーが発生しました:", error);
+          document.getElementById("error-message").innerText = "カメラの確認中にエラーが発生しました。";
+        });
+    }
 
-    // カメラの許可を要求し、QRコードのスキャンを開始
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    // カメラの権限を要求する
+    function requestCameraPermission() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          startQRScanner(); // 権限が許可されたらQRスキャナーを開始
+        })
+        .catch(error => {
+          console.error("カメラアクセスの許可が得られませんでした:", error);
+          document.getElementById("error-message").innerText = "カメラの許可が必要です。";
+        });
+    }
+
+    // QRコードリーダーの初期化と起動
+    function startQRScanner() {
+      let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader",
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        /* verbose= */ false
+      );
+
+      // QRコードのスキャンを開始
+      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    }
+
+    // ページ読み込み時にカメラの確認を開始
+    window.onload = function() {
+      checkCameraPermissions();
+    };
   </script>
 </body>
 </html>
