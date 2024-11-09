@@ -64,8 +64,8 @@
 <body>
   <div class="container">
     <h1>QRコードを読み取る</h1>
-    <!-- カメラ映像またはエラーメッセージ表示エリア -->
-    <div id="reader">カメラの許可が必要です</div>
+    <!-- カメラ映像表示 -->
+    <div id="reader"></div>
     <!-- QRコード読み取り結果表示 -->
     <div id="result">QRコードの内容がここに表示されます。</div>
     <!-- エラーメッセージ表示 -->
@@ -121,7 +121,11 @@
     function startQRScanner() {
       let html5QrcodeScanner = new Html5QrcodeScanner(
         "reader",
-        { fps: 10, qrbox: { width: 250, height: 250 } },
+        { 
+          fps: 10, 
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        },
         /* verbose= */ false
       );
 
